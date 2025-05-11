@@ -18,7 +18,7 @@ class Generator(nn.Module):
 
             self.layer(final_conv_size * 2, final_conv_size),
 
-            # Final layer consistinf of fractionally-strided convolution and Tanh activation function
+            # Final layer consisting of fractionally-strided convolution and Tanh activation function
             nn.ConvTranspose2d(final_conv_size, output_channels, 4, 2, 1),
             nn.Tanh()
         )
