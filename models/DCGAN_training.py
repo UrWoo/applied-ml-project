@@ -17,7 +17,7 @@ final_convolution_classes = 128
 image_channels = 3
 learning_rate = 0.0002
 beta_one = 0.5
-epochs = 1
+epochs = 5
 
 
 # Load dataset
@@ -71,9 +71,6 @@ loss = nn.BCELoss()
 
 for epoch in range(epochs):
     for i, data in enumerate(dataloader):
-        print(epoch, i)
-        if i > 50:
-            break
         # Generate noise from uniform distribution
         noise = (
             torch.rand(batch_size, noise_dimension).to(device) * 2 - 1
