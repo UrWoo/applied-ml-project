@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import torchvision.transforms as transforms
-from torchvision.datasets import ImageFolder
+from torchvision.datasets import ImageFolder, MNIST
 import torchvision.utils
 from torch.utils.data import DataLoader, Dataset
 import matplotlib.pyplot as plt
@@ -14,10 +14,10 @@ data_root = ""
 batch_size = 128
 noise_dimension = 100
 final_convolution_classes = 128
-image_channels = 3
+image_channels = 1
 learning_rate = 0.0002
 beta_one = 0.5
-epochs = 5
+epochs = 1
 
 
 # Load dataset
@@ -31,15 +31,17 @@ dataset = ImageFolder(
     ),
 )
 
+# dataset_MNIST = MNIST(root="dataset/", train=True, download=True, transform=transforms.Compose([
+#     transforms.Resize(64),
+#     transforms.ToTensor(),
+#     transforms.Normalize((0.5), (0.5))
+# ]))
+
 # Set up dataloader
 dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 
 # Set up device to use accelerator when available
-device = torch.device(
-    torch.accelerator.current_accelerator().type
-    if torch.accelerator.is_available()
-    else "cpu"
-)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Set up generator
 generator = Generator(
@@ -68,6 +70,13 @@ disc_opt = torch.optim.Adam(
 
 # Set up loss function
 loss = nn.BCELoss()
+
+# Fixed noise vector to visualize training
+fixed_noise = torch.rand(64, noise_dimension).to(device) * 2 - 1
+
+gen_losses = []
+disc_losses = []
+images = []
 
 for epoch in range(epochs):
     for i, data in enumerate(dataloader):
@@ -105,3 +114,30 @@ for epoch in range(epochs):
         gen_opt.zero_grad()
         gen_loss.backward()
         gen_opt.step()
+
+        # Show how the training is going
+        gen_losses.append(gen_loss.item())
+        disc_losses.append(disc_loss.item())
+
+        if i % 20 == 0:
+            with torch.no_grad():
+                imgs = generator(fixed_noise).detach()
+            images.append(imgs)
+
+        print(epoch, i)
+
+# Print loss graph
+plt.title("Generator and Discriminator Losses")
+plt.plot(gen_losses,label="generator losses")
+plt.plot(disc_losses,label="discriminator losses")
+plt.xlabel("i")
+plt.ylabel("Loss")
+plt.legend()
+plt.show()
+
+# Print progress on a fixed noise vector
+for img in images:
+    grid = torchvision.utils.make_grid(img, padding=2, normalize=True)
+
+    plt.imshow(grid.permute(1,2,0).cpu().numpy())
+    plt.show()
