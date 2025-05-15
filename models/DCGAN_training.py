@@ -125,8 +125,6 @@ for epoch in range(epochs):
                 imgs = generator(fixed_noise).detach()
             images.append(imgs)
 
-        print(epoch, i)
-
 # Print loss graph
 plt.title("Generator and Discriminator Losses")
 plt.plot(gen_losses,label="generator losses")
