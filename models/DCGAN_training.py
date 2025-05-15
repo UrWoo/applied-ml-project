@@ -80,17 +80,18 @@ images = []
 
 for epoch in range(epochs):
     for i, data in enumerate(dataloader):
-        # Generate noise from uniform distribution
-        noise = (
-            torch.rand(batch_size, noise_dimension).to(device) * 2 - 1
-        )
-
         # Train discriminator
         # Real images
         real_images = data[0].to(device)
         disc_real_output = discriminator(real_images).flatten()
         disc_real_labels = torch.ones_like(disc_real_output)
         disc_real_loss = loss(disc_real_output, disc_real_labels)
+
+                # Generate noise from uniform distribution
+        noise = (
+            torch.rand(real_images.size(0), noise_dimension).to(device) * 2 - 1
+        )
+
 
         # Fake images
         fake_images = generator(noise)
@@ -133,11 +134,18 @@ plt.plot(disc_losses,label="discriminator losses")
 plt.xlabel("i")
 plt.ylabel("Loss")
 plt.legend()
-plt.show()
+plt.savefig('loss_graph.png')
+plt.close()
 
 # Print progress on a fixed noise vector
-for img in images:
+for i, img in enumerate(images):
     grid = torchvision.utils.make_grid(img, padding=2, normalize=True)
 
+    plt.figure()
     plt.imshow(grid.permute(1,2,0).cpu().numpy())
-    plt.show()
+    plt.axis('off')
+    plt.savefig(f'grid_{i}.png')
+    plt.close()
+
+torch.save(generator.state_dict(), 'generator.pth')
+torch.save(discriminator.state_dict(), 'discriminator.pth')
