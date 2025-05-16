@@ -10,14 +10,23 @@ import matplotlib.pyplot as plt
 from DCGAN import Discriminator, Generator, init_weights
 
 # Set up hyperparameters
-data_root = ""
+data_root = "processed_data"
 batch_size = 128
 noise_dimension = 100
 final_convolution_classes = 128
-image_channels = 1
+image_channels = 3
 learning_rate = 0.0002
 beta_one = 0.5
-epochs = 1
+epochs = 50
+
+results_path = 'results'
+grid_path = 'results/grid'
+
+if not os.path.exists(results_path):
+    os.makedirs(results_path)
+
+if not os.path.exists(grid_path):
+    os.makedirs(grid_path)
 
 
 # Load dataset
@@ -31,14 +40,8 @@ dataset = ImageFolder(
     ),
 )
 
-# dataset_MNIST = MNIST(root="dataset/", train=True, download=True, transform=transforms.Compose([
-#     transforms.Resize(64),
-#     transforms.ToTensor(),
-#     transforms.Normalize((0.5), (0.5))
-# ]))
-
 # Set up dataloader
-dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
+dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=4)
 
 # Set up device to use accelerator when available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -79,6 +82,8 @@ disc_losses = []
 images = []
 
 for epoch in range(epochs):
+    running_gen_loss = 0
+    running_disc_loss = 0
     for i, data in enumerate(dataloader):
         # Train discriminator
         # Real images
@@ -87,11 +92,10 @@ for epoch in range(epochs):
         disc_real_labels = torch.ones_like(disc_real_output)
         disc_real_loss = loss(disc_real_output, disc_real_labels)
 
-                # Generate noise from uniform distribution
+        # Generate noise from uniform distribution
         noise = (
             torch.rand(real_images.size(0), noise_dimension).to(device) * 2 - 1
         )
-
 
         # Fake images
         fake_images = generator(noise)
@@ -116,14 +120,17 @@ for epoch in range(epochs):
         gen_loss.backward()
         gen_opt.step()
 
-        # Show how the training is going
-        gen_losses.append(gen_loss.item())
-        disc_losses.append(disc_loss.item())
+        # Calculate running loss
+        running_gen_loss += gen_loss.item() * data[0].size(0)
+        running_disc_loss += disc_loss.item() * data[0].size(0)
 
-        if i % 20 == 0:
-            with torch.no_grad():
-                imgs = generator(fixed_noise).detach()
-            images.append(imgs)
+    with torch.no_grad():
+        imgs = generator(fixed_noise).detach()
+    images.append(imgs)
+
+    gen_losses.append(running_gen_loss / len(dataloader.dataset))
+    disc_losses.append(running_disc_loss / len(dataloader.dataset))
+
 
 # Print loss graph
 plt.title("Generator and Discriminator Losses")
@@ -132,7 +139,7 @@ plt.plot(disc_losses,label="discriminator losses")
 plt.xlabel("i")
 plt.ylabel("Loss")
 plt.legend()
-plt.savefig('loss_graph.png')
+plt.savefig(os.path.join(results_path, 'loss_graph.png'))
 plt.close()
 
 # Print progress on a fixed noise vector
@@ -142,7 +149,7 @@ for i, img in enumerate(images):
     plt.figure()
     plt.imshow(grid.permute(1,2,0).cpu().numpy())
     plt.axis('off')
-    plt.savefig(f'grid_{i}.png')
+    plt.savefig(os.path.join(grid_path, f'grid_epoch_{i}.png'))
     plt.close()
 
 torch.save(generator.state_dict(), 'generator.pth')
