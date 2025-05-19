@@ -17,7 +17,7 @@ final_convolution_classes = 128
 image_channels = 3
 learning_rate = 0.00005
 beta_one = 0.5
-epochs = 250
+epochs = 10
 critic_iterations = 5
 clipping_parameter = 0.01
 
@@ -82,17 +82,21 @@ critic_losses = []
 images = []
 data_iter = iter(dataloader)
 i = 0
+epoch = 0
 
-for epoch in range(epochs):
+while epoch < epochs:
     # TODO change to until converges
     # Train critic
     for _ in range(critic_iterations):
         # Sample batch from real data
         try:
-            real_images = next(data_iter).to(device)
+            real_images, _ = next(data_iter)
+            real_images.to(device)
         except StopIteration:
+            epoch += 1
             data_iter = iter(dataloader)
-            real_images = next(data_iter).to(device)
+            real_images, _ = next(data_iter)
+            real_images.to(device)
 
         # Generate noise from uniform distribution
         noise = (
@@ -129,7 +133,7 @@ for epoch in range(epochs):
     fake_images = generator(noise)
 
     # Get critic prediction
-    critic_fake_images = (fake_images).flatten()
+    critic_fake_images = critic(fake_images).flatten()
 
     # Get loss
     gen_loss = -torch.mean(critic_fake_images)
