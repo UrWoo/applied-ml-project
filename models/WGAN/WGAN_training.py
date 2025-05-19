@@ -91,12 +91,12 @@ while epoch < epochs:
         # Sample batch from real data
         try:
             real_images, _ = next(data_iter)
-            real_images.to(device)
+            real_images = real_images.to(device)
         except StopIteration:
             epoch += 1
             data_iter = iter(dataloader)
             real_images, _ = next(data_iter)
-            real_images.to(device)
+            real_images = real_images.to(device)
 
         # Generate noise from uniform distribution
         noise = (
