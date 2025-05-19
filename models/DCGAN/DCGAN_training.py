@@ -19,8 +19,8 @@ learning_rate = 0.0002
 beta_one = 0.5
 epochs = 50
 
-results_path = 'results'
-grid_path = 'results/grid'
+results_path = "results"
+grid_path = "results/grid"
 
 if not os.path.exists(results_path):
     os.makedirs(results_path)
@@ -41,7 +41,13 @@ dataset = ImageFolder(
 )
 
 # Set up dataloader
-dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=4)
+dataloader = DataLoader(
+    dataset=dataset,
+    batch_size=batch_size,
+    shuffle=True,
+    pin_memory=True,
+    num_workers=4,
+)
 
 # Set up device to use accelerator when available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -107,16 +113,16 @@ for epoch in range(epochs):
         disc_loss = disc_real_loss + disc_fake_loss
 
         # Do a backwards pass
-        disc_opt.zero_grad()
+        discriminator.zero_grad()
         disc_loss.backward()
         disc_opt.step()
 
         # Train generator
         gen_disc_output = discriminator(fake_images).flatten()
         gen_loss = loss(gen_disc_output, disc_real_labels)
-        
+
         # Do a backwards pass
-        gen_opt.zero_grad()
+        generator.zero_grad()
         gen_loss.backward()
         gen_opt.step()
 
@@ -134,12 +140,12 @@ for epoch in range(epochs):
 
 # Print loss graph
 plt.title("Generator and Discriminator Losses")
-plt.plot(gen_losses,label="generator losses")
-plt.plot(disc_losses,label="discriminator losses")
+plt.plot(gen_losses, label="generator losses")
+plt.plot(disc_losses, label="discriminator losses")
 plt.xlabel("i")
 plt.ylabel("Loss")
 plt.legend()
-plt.savefig(os.path.join(results_path, 'loss_graph.png'))
+plt.savefig(os.path.join(results_path, "loss_graph.png"))
 plt.close()
 
 # Print progress on a fixed noise vector
@@ -147,10 +153,10 @@ for i, img in enumerate(images):
     grid = torchvision.utils.make_grid(img, padding=2, normalize=True)
 
     plt.figure()
-    plt.imshow(grid.permute(1,2,0).cpu().numpy())
-    plt.axis('off')
-    plt.savefig(os.path.join(grid_path, f'grid_epoch_{i}.png'))
+    plt.imshow(grid.permute(1, 2, 0).cpu().numpy())
+    plt.axis("off")
+    plt.savefig(os.path.join(grid_path, f"grid_epoch_{i}.png"))
     plt.close()
 
-torch.save(generator.state_dict(), 'generator.pth')
-torch.save(discriminator.state_dict(), 'discriminator.pth')
+torch.save(generator.state_dict(), "generator.pth")
+torch.save(discriminator.state_dict(), "discriminator.pth")
