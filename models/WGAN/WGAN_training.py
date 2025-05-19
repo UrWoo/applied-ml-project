@@ -7,7 +7,7 @@ from torchvision.datasets import ImageFolder, MNIST
 import torchvision.utils
 from torch.utils.data import DataLoader, Dataset
 import matplotlib.pyplot as plt
-from WGAN import critic, Generator, init_weights
+from WGAN import Critic, Generator, init_weights
 
 # Set up hyperparameters
 data_root = "processed_data"
@@ -63,7 +63,7 @@ generator = Generator(
 generator.apply(init_weights)
 
 # Set up critic
-critic = critic(
+critic = Critic(
     first_conv_size=final_convolution_classes,
     input_channels=image_channels,
 ).to(device)
