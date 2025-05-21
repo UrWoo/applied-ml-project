@@ -113,7 +113,7 @@ for epoch in range(epochs):
         disc_loss = disc_real_loss + disc_fake_loss
 
         # Do a backwards pass
-        discriminator.zero_grad()
+        disc_opt.zero_grad()
         disc_loss.backward()
         disc_opt.step()
 
@@ -122,9 +122,15 @@ for epoch in range(epochs):
         gen_loss = loss(gen_disc_output, disc_real_labels)
 
         # Do a backwards pass
-        generator.zero_grad()
+        gen_opt.zero_grad()
         gen_loss.backward()
         gen_opt.step()
+
+        if i == 0:
+            print(
+                f"Epoch {epoch}, batch {i} -- gen loss = {gen_loss.item()}, disc loss = {disc_loss.item()}"
+            )
+            print(f"data[0].size(0) = {data[0].size(0)}")
 
         # Calculate running loss
         running_gen_loss += gen_loss.item() * data[0].size(0)

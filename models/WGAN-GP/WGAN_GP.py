@@ -47,7 +47,9 @@ class Critic(nn.Module):
     def layer(self, input_channels, output_channels):
         return nn.Sequential(
             nn.Conv2d(input_channels, output_channels, 4, 2, 1),
-            nn.BatchNorm2d(output_channels),
+            nn.GroupNorm(
+                num_channels=output_channels, num_groups=1, affine=True
+            ),
             nn.LeakyReLU(0.2),
         )
 

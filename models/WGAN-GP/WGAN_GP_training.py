@@ -3,11 +3,12 @@ import torch
 import torch.nn as nn
 import numpy as np
 import torchvision.transforms as transforms
-from torchvision.datasets import ImageFolder, MNIST
+from torchvision.datasets import ImageFolder
 import torchvision.utils
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-from WGAN import Critic, Generator, init_weights
+from WGAN_GP import Critic, Generator, init_weights
+from gp_calc import gradient_penalty
 
 # Set up hyperparameters
 data_root = "processed_data"
@@ -15,11 +16,12 @@ batch_size = 64
 noise_dimension = 100
 final_convolution_classes = 128
 image_channels = 3
-learning_rate = 0.00005
-beta_one = 0.5
+learning_rate = 0.0001
+beta_one = 0.0
+beta_two = 0.9
+lambda_gp = 10
 epochs = 250
 critic_iterations = 5
-clipping_parameter = 0.01
 
 results_path = "results"
 grid_path = "results/grid"
@@ -71,8 +73,12 @@ critic = Critic(
 critic.apply(init_weights)
 
 # Set up optimizers
-gen_opt = torch.optim.RMSprop(generator.parameters(), lr=learning_rate)
-critic_opt = torch.optim.RMSprop(critic.parameters(), lr=learning_rate)
+gen_opt = torch.optim.Adam(
+    generator.parameters(), lr=learning_rate, betas=(beta_one, beta_two)
+)
+critic_opt = torch.optim.Adam(
+    critic.parameters(), lr=learning_rate, betas=(beta_one, beta_two)
+)
 
 # Fixed noise vector to visualize training
 fixed_noise = torch.randn(64, noise_dimension).to(device)
@@ -108,19 +114,20 @@ while epoch < epochs:
         critic_real_images = critic(real_images).flatten()
         critic_fake_images = critic(fake_images.detach()).flatten()
 
+        # Get gradient penalty
+        gp = gradient_penalty(critic, real_images, fake_images, device=device)
+
         # Get loss
         critic_loss = -(
-            torch.mean(critic_real_images) - torch.mean(critic_fake_images)
+            torch.mean(critic_real_images)
+            - torch.mean(critic_fake_images)
+            + lambda_gp * gp
         )
 
         # Do a backwards pass
         critic.zero_grad()
         critic_loss.backward()
         critic_opt.step()
-
-        # Clip weights
-        for param in critic.parameters():
-            param.data.clamp_(-clipping_parameter, clipping_parameter)
 
     # Train generator
 
