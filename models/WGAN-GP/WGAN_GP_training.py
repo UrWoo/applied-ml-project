@@ -118,9 +118,8 @@ while epoch < epochs:
         gp = gradient_penalty(critic, real_images, fake_images, device=device)
 
         # Get loss
-        critic_loss = -(
-            torch.mean(critic_real_images)
-            - torch.mean(critic_fake_images)
+        critic_loss = (
+            -(torch.mean(critic_real_images) - torch.mean(critic_fake_images))
             + lambda_gp * gp
         )
 
