@@ -2,4 +2,3 @@ applied-ml
 **/__pycache__
 results
 .venv
-/models/FID_picture_generation/complex_random_generation.py
