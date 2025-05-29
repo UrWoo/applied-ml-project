@@ -78,7 +78,7 @@ app = FastAPI(
 generator = Generator(noise_dim=100, final_conv_size=128, output_channels=3)
 
 generator.load_state_dict(
-    torch.load("parameters/WGAN-GP-250epochs/generator.pth", weights_only=True)
+    torch.load("parameters/WGAN-GP-250epochs/generator.pth", weights_only=True, map_location=torch.device('cpu'))
 )
 
 generator.eval()

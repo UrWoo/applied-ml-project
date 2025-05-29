@@ -21,7 +21,7 @@ git clone https://github.com/UrWoo/applied-ml-project.git
 ```
 In the repository folder install dependencies using
 ```
-python -m pip -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 Then run the api
 ```
