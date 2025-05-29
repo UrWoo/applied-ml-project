@@ -15,7 +15,18 @@ pip install pytorch-fid
 python -m pytorch_fid path/to/real_faces path/to/generated_faces
 ```
 
-## TODO
+### Run API locally
+To run the API first download the repository as a zip file or use 
+```
+git clone https://github.com/UrWoo/applied-ml-project.git
+```
+In the repository folder install dependencies using
+```
+python -m pip -r requirements.txt
+```
+Then run the api
+```
+fastapi run API/wgan_api.py
+```
 
-- Useful readme.md
-- Make an API
+GET request to generate image should be called to `/image`
