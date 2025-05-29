@@ -2,3 +2,4 @@ applied-ml
 **/__pycache__
 results
 .venv
+data
