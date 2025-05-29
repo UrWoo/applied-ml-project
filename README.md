@@ -16,6 +16,7 @@ python -m pytorch_fid path/to/real_faces path/to/generated_faces
 ```
 
 ### Run API locally
+`Python 3.12` is recommended but it will most likely work on other versions(idk haven't tested)
 To run the API first download the repository as a zip file or use 
 ```
 git clone https://github.com/UrWoo/applied-ml-project.git
