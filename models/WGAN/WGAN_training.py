@@ -1,11 +1,9 @@
 import os
 import torch
-import torch.nn as nn
-import numpy as np
 import torchvision.transforms as transforms
-from torchvision.datasets import ImageFolder, MNIST
+from torchvision.datasets import ImageFolder
 import torchvision.utils
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 from WGAN import Critic, Generator, init_weights
 

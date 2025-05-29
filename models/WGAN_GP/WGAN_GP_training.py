@@ -1,7 +1,5 @@
 import os
 import torch
-import torch.nn as nn
-import numpy as np
 import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
 import torchvision.utils
@@ -115,7 +113,7 @@ while epoch < epochs:
         critic_fake_images = critic(fake_images.detach()).flatten()
 
         # Get gradient penalty
-        gp = gradient_penalty(critic, real_images, fake_images, device=device)
+        gp = gradient_penalty(critic, real_images, fake_images, device=device)  # type: ignore
 
         # Get loss
         critic_loss = (

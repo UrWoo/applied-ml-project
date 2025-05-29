@@ -1,11 +1,10 @@
 import os
 import torch
 import torch.nn as nn
-import numpy as np
 import torchvision.transforms as transforms
-from torchvision.datasets import ImageFolder, MNIST
+from torchvision.datasets import ImageFolder
 import torchvision.utils
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 from DCGAN import Discriminator, Generator, init_weights
 
@@ -140,8 +139,8 @@ for epoch in range(epochs):
         imgs = generator(fixed_noise).detach()
     images.append(imgs)
 
-    gen_losses.append(running_gen_loss / len(dataloader.dataset))
-    disc_losses.append(running_disc_loss / len(dataloader.dataset))
+    gen_losses.append(running_gen_loss / len(dataloader.dataset))  # type: ignore
+    disc_losses.append(running_disc_loss / len(dataloader.dataset))  # type: ignore
 
 
 # Print loss graph
