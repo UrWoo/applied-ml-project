@@ -30,6 +30,15 @@ fastapi run API/wgan_api.py
 
 to generate an image send a GET request to `/image`
 
+### Run streamlit locally
+To run the streamlit applicati,on you need to run the following command:
+```
+streamlit run API/GANs_project.py
+```
+(presuming, you already installed `requirements.txt`)
+
+Note: The `Generate Image` page will work only with api running in the background. The `Detect Fake Image` will work even without it.
+
 ### Train the models
 If you want to train the models on your own data, place the dataset into data/*name of your dataset*/images and decide which model to train.
 
