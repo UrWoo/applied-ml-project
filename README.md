@@ -28,4 +28,15 @@ Then run the api
 fastapi run API/wgan_api.py
 ```
 
-GET request to generate image should be called to `/image`
+to generate an image send a GET request to `/image`
+
+### Train the models
+If you want to train the models on your own data, place the dataset into data/*name of your dataset*/images and decide which model to train.
+
+In models/*model_name*/*model_name*_training,py replace `data_root` variable with the absolute path to your dataset(without /images), and change necessary hyperparameters, mainly `image_channels` to 1 if using grayscale images, and `epochs` to the number of epochs to train your model.
+
+Then just install dependencies and run the model using
+```
+python3 -m pip install -r requirements.txt
+python3 models/*model_name*/*model_name*_training,py
+```
