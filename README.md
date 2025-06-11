@@ -15,7 +15,7 @@ python -m pytorch_fid path/to/real_faces path/to/generated_faces
 
 ### Run API locally
 `Python 3.12` is recommended but it will most likely work on other versions(idk haven't tested)
-To run the API first download the repository as a zip file or use 
+To run the API, first download the repository as a zip file or use 
 ```
 git clone https://github.com/UrWoo/applied-ml-project.git
 ```
@@ -28,16 +28,14 @@ Then run the api
 fastapi run API/wgan_api.py
 ```
 
-to generate an image send a GET request to `/image`
+to generate an image, send a GET request to `/image`
 
 ### Run streamlit locally
-To run the streamlit applicati,on you need to run the following command:
+To run the streamlit application, you need to run the following command:
 ```
 streamlit run API/GANs_project.py
 ```
-(presuming, you already installed `requirements.txt`)
-
-Note: The `Generate Image` page will work only with api running in the background. The `Detect Fake Image` will work even without it.
+(presuming you already installed `requirements.txt`)
 
 ### Train the models
 If you want to train the models on your own data, place the dataset into data/*name of your dataset*/images and decide which model to train.
