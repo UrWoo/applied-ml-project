@@ -1,8 +1,6 @@
 import os
 import sys
 import streamlit as st
-import pandas as pd
-from io import StringIO
 import torch
 import torchvision.transforms as transforms
 from PIL import Image
@@ -12,7 +10,6 @@ project_root = os.path.abspath(
 )
 sys.path.insert(0, project_root)
 
-from models.WGAN_GP import WGAN_GP
 from models.DCGAN import DCGAN
 
 uploaded_file = st.file_uploader("Choose a file")
@@ -53,7 +50,16 @@ if uploaded_file is not None:
     critic.eval()
 
     probability = critic(transformed_image)
-    # probability = torch.sigmoid(critic_output)
 
-    # st.write(probability)
-    st.write(f"Probability that the image is fake: {(100 - probability[0][0] * 100):.4f}%")
+    fake_probability = float(100 - probability[0][0] * 100)
+
+    # Color-coded progress bar
+    if fake_probability > 70:
+        st.error(f"🚨 High probability of fake image: **{fake_probability:.2f}%**")
+        st.progress(fake_probability / 100)
+    elif fake_probability > 30:
+        st.warning(f"⚠️ Moderate probability of fake image: **{fake_probability:.2f}%**")
+        st.progress(fake_probability / 100)
+    else:
+        st.success(f"✅ Low probability of fake image: **{fake_probability:.2f}%**")
+        st.progress(fake_probability / 100)
