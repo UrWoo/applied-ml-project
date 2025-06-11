@@ -28,7 +28,7 @@ if uploaded_file is not None:
     transformed_image = transformed_image.unsqueeze(0)
 
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")
     critic = DCGAN.Discriminator(
         first_conv_size=128, input_channels=3
     )
@@ -49,7 +49,10 @@ if uploaded_file is not None:
     critic.to(device)
     critic.eval()
 
-    probability = critic(transformed_image)
+    transformed_image = transformed_image.to(device)
+
+    with torch.no_grad():
+        probability = critic(transformed_image)
 
     fake_probability = float(100 - probability[0][0] * 100)
 
